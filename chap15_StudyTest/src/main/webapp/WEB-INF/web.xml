@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd" id="WebApp_ID" version="4.0">
+  <display-name>chap15_StudyTest</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+  </welcome-file-list>
+  
+  <!-- 한글 깨짐 방지를 위한 필터 설정 -->
+  <filter>
+  	<filter-name>SetCharEncoding</filter-name>
+  	<filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
+  	<init-param>
+  		<param-name>encoding</param-name>
+  		<param-value>utf-8</param-value>
+  	</init-param>
+  </filter>
+  <filter-mapping>
+  	<filter-name>SetCharEncoding</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- 페이징 게시판 처리 위한 설정값 -->
+  <context-param>
+  	<param-name>POSTS_PER_PAGE</param-name>
+  	<param-value>10</param-value>
+  </context-param>
+  <context-param>
+  	<param-name>PAGES_PER_BLOCK</param-name>
+  	<param-value>5</param-value>
+  </context-param>
+  
+  <!-- 서블릿 매핑 -->
+  <servlet>
+  	<servlet-name>BoardList</servlet-name>
+  	<servlet-class>kr.co.ezenac.model2.board.ListController</servlet-class>
+  </servlet>
+ <servlet-mapping>
+ 	<servlet-name>BoardList</servlet-name>
+ 	<url-pattern>/board/list.do </url-pattern>
+ </servlet-mapping> 
+ 
+ <servlet>
+ 	<servlet-name>BoardWrite</servlet-name>
+ 	<servlet-class>kr.co.ezenac.model2.board.WriteController</servlet-class>
+ </servlet>
+ <servlet-mapping>
+ 	<servlet-name>BoardWrite</servlet-name>
+ 	<url-pattern>/board/write.do</url-pattern>
+ </servlet-mapping>
+ 
+ <!-- 첨부 파일 최대 용량 설정 1024000 = 1MB -->
+ <context-param>
+ 	<param-name>maxPostSize</param-name>
+ 	<param-value>1024000</param-value>
+ </context-param>
+</web-app>
