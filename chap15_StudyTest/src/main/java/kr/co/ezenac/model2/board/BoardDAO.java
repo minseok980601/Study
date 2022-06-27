@@ -89,4 +89,118 @@ public class BoardDAO extends JDBConnection{
 		
 		return board;
 	}
+	
+	// 게시글 데이터를 받아 DB에 추가함(파일 업로드 지원)
+	public int insertWrite(BoardDTO dto) {
+		int result = 0;
+		
+		String query = "INSERT INTO MVCBOARD "
+					 + " (IDX, NAME, TITLE, CONTENT, OFILE, SFILE, PASS) "
+					 + " VALUES (seq_board_num.nextval, ?, ?, ?, ?, ?, ? )";
+		
+		try {
+			psmt = con.prepareStatement(query);
+			psmt.setString(1, dto.getName());
+			psmt.setString(2, dto.getTitle());
+			psmt.setString(3, dto.getContent());
+			psmt.setString(4, dto.getOfile());
+			psmt.setString(5, dto.getSfile());
+			psmt.setString(6, dto.getPass());
+			result = psmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("게시물 입력 중 예외 발생");
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	// 주어진 일변번호에 해당하는 게시물을 DTO에 담아 반환
+	public BoardDTO selectView(String idx) {
+		BoardDTO dto = new BoardDTO();
+		
+		String query = "SELECT * FROM MVCBOARD WHERE IDX = ?";
+		
+		try {
+			psmt = con.prepareStatement(query);
+			psmt.setString(1, idx);
+			rs = psmt.executeQuery();
+			
+			if (rs.next()) {
+				dto.setIdx(rs.getString(1));
+				dto.setName(rs.getString(2));
+				dto.setTitle(rs.getString(3));
+				dto.setContent(rs.getString(4));
+				dto.setPostdate(rs.getDate(5));
+				dto.setOfile(rs.getString(6));
+				dto.setSfile(rs.getString(7));
+				dto.setDownload(rs.getInt(8));
+				dto.setPass(rs.getString(9));
+				dto.setVisitcount(rs.getInt(10));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			e.printStackTrace();
+		}
+		
+		return dto;
+	}
+	
+	// 주어진 일련번호에 해당하는 게시물의 조회수를 1 증가시킴
+	public void updateVisitCount(String idx) {
+		String query = "UPDATE MVCBOARD SET VISITCOUNT = VISITCOUNT + 1 "
+					 + " WHERE idx = ?";
+		
+		try {
+			psmt = con.prepareStatement(query);
+			psmt.setString(1, idx);
+			psmt.executeQuery();
+		} catch (SQLException e) {
+			System.out.println("게시물 조회수 증가 중 예외 발생");
+			e.printStackTrace();
+		}
+	}
+	
+	// 다운로드 횟수 1 증가
+	public void downCountPlus(String idx) {
+		String query = "UPDATE MVCBOARD SET DOWNLOAD = DOWNLOAD + 1 "
+					 + " WHERE idx = ?";
+		
+		try {
+			psmt = con.prepareStatement(query);
+			psmt.setString(1, idx);
+			psmt.executeQuery();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	// 입력한 비밀번호가 지정한 일련번호의 게시물의 비밀번호와 일치하는지 확인
+	public boolean confirmPassword(String pass, String idx) {
+		boolean isCorrect = true;
+		
+		// 비밀번호와 일련번호가 일치하는 개수를 새어 => 비밀번호와 일치하는지 확인
+		String sql = "SELECT count(*) FROM MVCBOARD "
+				   + " WHERE pass = ? AND idx = ?";
+		
+		try {
+			psmt = con.prepareStatement(sql);
+			psmt.setString(1, pass);
+			psmt.setString(2, idx);
+			rs = psmt.executeQuery();
+			
+			rs.next();
+			// 일치하는 게시물이 없다면 false 반환
+			if (rs.getInt(1) == 0) {
+				isCorrect = false;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return isCorrect;
+	}
 }
